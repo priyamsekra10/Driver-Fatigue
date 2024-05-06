@@ -14,7 +14,7 @@ def refine(boxes, max_width, max_height, shift=0.1):
     Returns:
        Refined results.
     """
-    refined = boxes.copy()
+    refined = boxes.copy() 
     width = refined[:, 2] - refined[:, 0]
     height = refined[:, 3] - refined[:, 1]
 

@@ -2,7 +2,6 @@
 https://github.com/deepinsight/insightface/tree/master/detection/scrfd
 """
 import os
-
 import cv2
 import numpy as np
 import onnxruntime

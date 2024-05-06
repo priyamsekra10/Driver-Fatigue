@@ -1,6 +1,5 @@
 """Human facial landmark detector based on Convolutional Neural Network."""
 import os
-
 import cv2
 import numpy as np
 import onnxruntime as ort
@@ -14,7 +13,7 @@ class MarkDetector:
 
         Args:
             model_file (str): ONNX model path.
-        """
+        """ 
         assert os.path.exists(model_file), f"File not found: {model_file}"
         self._input_size = 128
         self.model = ort.InferenceSession(

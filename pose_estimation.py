@@ -16,7 +16,7 @@ class PoseEstimator:
         self.size = (image_height, image_width)
         self.model_points_68 = self._get_full_model_points()
 
-        # Camera internals
+        # Camera internals 
         self.focal_length = self.size[1]
         self.camera_center = (self.size[1] / 2, self.size[0] / 2)
         self.camera_matrix = np.array(
@@ -109,6 +109,24 @@ class PoseEstimator:
             point_2d[7]), color, line_width, cv2.LINE_AA)
         cv2.line(image, tuple(point_2d[3]), tuple(
             point_2d[8]), color, line_width, cv2.LINE_AA)
+
+        # Check head pose and display alert
+        pitch, yaw, roll = rotation_vector.ravel()
+        if pitch < -0.5:
+            cv2.putText(image, "Head left: Driver Distracted", (10, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        elif pitch > 0.5:
+            cv2.putText(image, "Head Right: Driver Distracted", (10, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        # elif yaw < 0.1:
+        #     cv2.putText(image, "Head UP", (10, 40),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        elif yaw > 0.5:
+            cv2.putText(image, "Head Down: Driver Drowsy", (10, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        else:
+            cv2.putText(image, "Head Pose Normal", (10, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     def draw_axes(self, img, pose):
         R, t = pose
