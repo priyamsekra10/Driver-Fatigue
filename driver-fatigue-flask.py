@@ -3,7 +3,7 @@ import cv2
 from scipy.spatial import distance
 from imutils import face_utils
 import numpy as np
-import dlib
+# import dlib
 from face_detection import FaceDetector
 from mark_detection import MarkDetector
 from pose_estimation import PoseEstimator
@@ -30,8 +30,8 @@ def run_on_image(frame):
     # Setup a face detector to detect human faces.
     face_detector = FaceDetector("assets/face_detector.onnx")
     face_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_frontalface_default.xml")
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+    # detector = dlib.get_frontal_face_detector()
+    # predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS['left_eye']
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS['right_eye']
 
@@ -80,27 +80,27 @@ def run_on_image(frame):
         face_detector.visualize(frame, faces)
 
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        for face in faces:
-            rect = dlib.rectangle(int(face[0]), int(face[1]), int(face[2]), int(face[3]))
-            shape = predictor(gray, rect)
-            shape = face_utils.shape_to_np(shape)
-            leftEye = shape[lStart:lEnd]
-            rightEye = shape[rStart:rEnd]
-            leftEyeAspectRatio = eye_aspect_ratio(leftEye)
-            rightEyeAspectRatio = eye_aspect_ratio(rightEye)
-            eyeAspectRatio = (leftEyeAspectRatio + rightEyeAspectRatio) / 2
-            leftEyeHull = cv2.convexHull(leftEye)
-            rightEyeHull = cv2.convexHull(rightEye)
-            cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
-            cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # for face in faces:
+        #     rect = dlib.rectangle(int(face[0]), int(face[1]), int(face[2]), int(face[3]))
+        #     shape = predictor(gray, rect)
+        #     shape = face_utils.shape_to_np(shape)
+        #     leftEye = shape[lStart:lEnd]
+        #     rightEye = shape[rStart:rEnd]
+        #     leftEyeAspectRatio = eye_aspect_ratio(leftEye)
+        #     rightEyeAspectRatio = eye_aspect_ratio(rightEye)
+        #     eyeAspectRatio = (leftEyeAspectRatio + rightEyeAspectRatio) / 2
+        #     leftEyeHull = cv2.convexHull(leftEye)
+        #     rightEyeHull = cv2.convexHull(rightEye)
+        #     cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+        #     cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            if eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD:
-                COUNTER += 1
-                if COUNTER >= EYE_ASPECT_RATIO_CONSEC_FRAMES:
-                    cv2.putText(frame, "You are Drowsy", (150, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 2)
-            else:
-                COUNTER = 0
+            # if eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD:
+            #     COUNTER += 1
+            #     if COUNTER >= EYE_ASPECT_RATIO_CONSEC_FRAMES:
+            #         cv2.putText(frame, "You are Drowsy", (150, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 2)
+            # else:
+            #     COUNTER = 0
 
 
 
@@ -110,7 +110,7 @@ def receive_and_process_stream():
     print("receive....")
 
     # Start capturing the video stream from the Flask server
-    cap = cv2.VideoCapture('http://192.168.48.198:8080/video_feed')
+    cap = cv2.VideoCapture('http://192.168.29.128:8080/video_feed')
 
 
     if not cap.isOpened():
