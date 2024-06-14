@@ -101,7 +101,7 @@ def receive_and_process_stream():
         processed_frame = run_on_image(frame)
 
         # Display the processed frame
-        cv2.imshow('Driver Fatigue Detection', processed_frame)
+        # cv2.imshow('Driver Fatigue Detection', processed_frame)
 
         # Save the frame to S3
         frame_count += 1
@@ -111,8 +111,8 @@ def receive_and_process_stream():
         if frame_count > 10:
             delete_frame_from_s3(frame_count - 10)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
     cv2.destroyAllWindows()
     signal(SIGPIPE, SIG_DFL)
