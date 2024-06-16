@@ -1,6 +1,38 @@
 """Estimate head pose according to the facial landmarks"""
 import cv2
 import numpy as np
+import boto3
+from dotenv import load_dotenv
+import os
+
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access the environment variables
+ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+# debug = os.getenv('DEBUG')
+
+
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY_ID,
+    aws_secret_access_key=SECRET_ACCESS_KEY
+)
+# Initialize the S3 client
+# s3_client = boto3.client('s3')
+bucket_name = 'resq'  # replace with your actual bucket name
+folder_name = 'video1'
+
+
+def download_model_from_s3(model_key, local_path):
+    s3_client.download_file(bucket_name, model_key, local_path)
+
+# Download the ONNX models from S3 and store the paths in variables
+c = "assets/model.txt"
+
+download_model_from_s3("driver-fatigue-models/model.txt", c)
 
 
 class PoseEstimator:
@@ -32,7 +64,7 @@ class PoseEstimator:
         self.t_vec = np.array(
             [[-14.97821226], [-10.62040383], [-2053.03596872]])
 
-    def _get_full_model_points(self, filename='assets/model.txt'):
+    def _get_full_model_points(self, filename=c):
         """Get all 68 3D model points from file"""
         raw_value = []
         with open(filename) as file:

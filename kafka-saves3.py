@@ -32,8 +32,16 @@ s3_client = boto3.client(
 bucket_name = 'resq'  # replace with your actual bucket name
 folder_name = 'video1'
 
+
+def download_model_from_s3(model_key, local_path):
+    s3_client.download_file(bucket_name, model_key, local_path)
+
+# Download the ONNX models from S3 and store the paths in variables
 a = "assets/face_detector.onnx"
 b = "assets/face_landmarks.onnx"
+
+download_model_from_s3("driver-fatigue-models/face_detector.onnx", a)
+download_model_from_s3("driver-fatigue-models/face_landmarks.onnx", b)
 
 
 # Function to calculate the Eye Aspect Ratio (EAR)
