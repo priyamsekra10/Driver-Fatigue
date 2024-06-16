@@ -10,9 +10,25 @@ from utils import refine
 from signal import signal, SIGPIPE, SIG_DFL
 import boto3
 import io
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access the environment variables
+ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+# debug = os.getenv('DEBUG')
+
+
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY_ID,
+    aws_secret_access_key=SECRET_ACCESS_KEY
+)
 # Initialize the S3 client
-s3_client = boto3.client('s3')
+# s3_client = boto3.client('s3')
 bucket_name = 'resq'  # replace with your actual bucket name
 folder_name = 'video1'
 
@@ -77,7 +93,7 @@ def delete_frame_from_s3(frame_number):
 def receive_and_process_stream():
     topic = 'video'
     consumer = KafkaConsumer(topic,
-                             bootstrap_servers=['13.233.134.122:9092'], 
+                             bootstrap_servers=['35.154.36.220:9092'], 
                              fetch_max_bytes=26214400,
                              max_partition_fetch_bytes=26214400)
 
@@ -101,7 +117,7 @@ def receive_and_process_stream():
         processed_frame = run_on_image(frame)
 
         # Display the processed frame
-        cv2.imshow('Driver Fatigue Detection', processed_frame)
+        # cv2.imshow('Driver Fatigue Detection', processed_frame)
 
         # Save the frame to S3
         frame_count += 1
@@ -111,8 +127,8 @@ def receive_and_process_stream():
         if frame_count > 10:
             delete_frame_from_s3(frame_count - 10)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
     cv2.destroyAllWindows()
     signal(SIGPIPE, SIG_DFL)
