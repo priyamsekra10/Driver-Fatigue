@@ -9,3 +9,8 @@ packaging==23.1
 protobuf==4.23.2
 sympy==1.12
 kafka-python
+scipy
+boto3
+imutils
+python-dotenv
+onnxruntime-gpu
