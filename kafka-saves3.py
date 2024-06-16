@@ -32,6 +32,10 @@ s3_client = boto3.client(
 bucket_name = 'resq'  # replace with your actual bucket name
 folder_name = 'video1'
 
+a = "assets/face_detector.onnx"
+b = "assets/face_landmarks.onnx"
+
+
 # Function to calculate the Eye Aspect Ratio (EAR)
 def eye_aspect_ratio(eye):
     A = distance.euclidean(eye[1], eye[5])
@@ -49,8 +53,8 @@ def run_on_image(frame):
     frame_height, frame_width, _ = frame.shape
 
     # Setup face, mark, and pose detectors
-    face_detector = FaceDetector("assets/face_detector.onnx")
-    mark_detector = MarkDetector("assets/face_landmarks.onnx")
+    face_detector = FaceDetector(a)
+    mark_detector = MarkDetector(b)
     pose_estimator = PoseEstimator(frame_width, frame_height)
 
     # Detect faces in the frame
