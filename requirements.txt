@@ -14,3 +14,4 @@ boto3
 imutils
 python-dotenv
 onnxruntime-gpu
+dlib

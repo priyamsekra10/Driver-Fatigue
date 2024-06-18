@@ -4,6 +4,7 @@ import numpy as np
 import boto3
 from dotenv import load_dotenv
 import os
+import datetime
 
 
 # Load environment variables from the .env file
@@ -24,6 +25,32 @@ s3_client = boto3.client(
 # s3_client = boto3.client('s3')
 bucket_name = 'resq'  # replace with your actual bucket name
 folder_name = 'video1'
+
+driver_id = "priyam_sekra"
+
+def update_driver_behavior(driver_id, behavior_data):
+    # Initialize a session using Amazon DynamoDB with credentials
+    dynamodb = boto3.resource(
+        'dynamodb',
+        aws_access_key_id=os.getenv('ACCESS_KEY_ID'),
+        aws_secret_access_key= os.getenv('SECRET_ACCESS_KEY'),
+        region_name='ap-south-1'
+    )
+
+    # Select your DynamoDB table
+    table = dynamodb.Table('DriverBehavior')
+
+    # Generate a timestamp
+    timestamp = datetime.datetime.utcnow().isoformat()
+
+    # Insert data into the table
+    response = table.put_item(
+       Item={
+            'DriverId': driver_id,
+            'Timestamp': timestamp,
+            'BehaviorData': behavior_data
+        }
+    )
 
 
 def download_model_from_s3(model_key, local_path):
@@ -145,15 +172,18 @@ class PoseEstimator:
         # Check head pose and display alert
         pitch, yaw, roll = rotation_vector.ravel()
         if pitch < -0.5:
+            update_driver_behavior(driver_id, "Driver distracted")
             cv2.putText(image, "Head left: Driver Distracted", (10, 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         elif pitch > 0.5:
+            update_driver_behavior(driver_id, "Driver distracted")
             cv2.putText(image, "Head Right: Driver Distracted", (10, 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         # elif yaw < 0.1:
         #     cv2.putText(image, "Head UP", (10, 40),
         #                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         elif yaw > 0.5:
+            update_driver_behavior(driver_id, "Driver distracted")
             cv2.putText(image, "Head Down: Driver Drowsy", (10, 40),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         else:
