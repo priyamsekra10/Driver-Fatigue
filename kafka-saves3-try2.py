@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 import os
 import dlib
 import datetime
-
+from tqdm import tqdm
 
 
 # Load environment variables from the .env file
@@ -37,13 +37,28 @@ bucket_name = 'resq'  # replace with your actual bucket name
 folder_name = 'video1'
 
 
+class ProgressPercentage(object):
+    def __init__(self, filename):
+        self._filename = filename
+        self._size = float(s3_client.head_object(Bucket=bucket_name, Key=filename)['ContentLength'])
+        self._seen_so_far = 0
+        self._lock = threading.Lock()
+        
+    def __call__(self, bytes_amount):
+        with self._lock:
+            self._seen_so_far += bytes_amount
+            percentage = (self._seen_so_far / self._size) * 100
+            tqdm.write(f"{self._filename}  {self._seen_so_far}/{self._size}  ({percentage:.2f}%)")
+
 def download_model_from_s3(model_key, local_path):
-    s3_client.download_file(bucket_name, model_key, local_path)
+    # Using tqdm to display the progress bar
+    with tqdm(total=int(s3_client.head_object(Bucket=bucket_name, Key=model_key)['ContentLength']), unit='B', unit_scale=True, desc=model_key) as pbar:
+        s3_client.download_file(bucket_name, model_key, local_path, Callback=lambda bytes_transferred: pbar.update(bytes_transferred))
 
 # Download the ONNX models from S3 and store the paths in variables
 a = "assets/face_detector.onnx"
 b = "assets/face_landmarks.onnx"
-d = "shape_predictor_68_face_landmarks.dat"
+d = "assets/shape_predictor_68_face_landmarks.dat"
 
 download_model_from_s3("driver-fatigue-models/face_detector.onnx", a)
 download_model_from_s3("driver-fatigue-models/face_landmarks.onnx", b)
